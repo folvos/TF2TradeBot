@@ -4,8 +4,7 @@
   },
   "steam": {
     "username": "",
-    "password": "",
-    "apiKey": ""
+    "password": ""
   },
   "mobileAuth": {
     "desktopAuthPassword": ""
