@@ -19,6 +19,11 @@
   "homepage": "https://github.com/yayes2/TF2TradeBot#readme",
   "dependencies": {
     "snazzy": "^5.0.0",
-    "standard": "^8.1.0"
+    "standard": "^8.1.0",
+    "steam": "^1.4.0",
+    "steam-totp": "^1.4.0",
+    "steam-tradeoffers": "^3.0.3",
+    "steam-web-api-key": "0.0.3",
+    "steam-weblogon": "0.0.5"
   }
 }
