@@ -1,4 +1,3 @@
-// API's and Requirements
 const fs = require('fs')
 const path = require('path')
 const Steam = require('steam')
