@@ -34,6 +34,7 @@ function steamLogin () {
   // On successful login
   steamClient.on('logOnResponse', () => {
     console.log('Steam account successfully authenticated')
+    console.log('Session ID:', steamClient.sessionID)
     console.log('Steam ID:', steamClient.steamID)
   })
 }
