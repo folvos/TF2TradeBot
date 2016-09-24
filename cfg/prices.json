@@ -1,0 +1,15 @@
+{
+  "items": {
+    "1": {
+      "name": "scrap",
+      "sell": {
+        "price": 2,
+        "unit": "weapons"
+      },
+      "buy": {
+        "price": 1,
+        "unit": "weapons"
+      }
+    }
+  }
+}
