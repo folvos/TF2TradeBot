@@ -18,6 +18,7 @@
   },
   "homepage": "https://github.com/yayes2/TF2TradeBot#readme",
   "dependencies": {
+    "aes-js": "^2.0.0",
     "snazzy": "^5.0.0",
     "standard": "^8.1.0",
     "steam": "^1.4.0",
