@@ -6,7 +6,9 @@ const steamTOTP = require('steam-totp')
 class MobileAuthHandler {
   constructor (sharedSecret, identitySecret, pass) {
     if (sharedSecret == null || identitySecret == null) {
-      this.initSecrets(pass)
+      let secrets = this.initSecrets(pass)
+      this.sharedSecret = secrets.sharedSecret
+      this.identitySecret = secrets.identitySecret
     } else {
       this.sharedSecret = sharedSecret
       this.identitySecret = identitySecret
@@ -15,7 +17,7 @@ class MobileAuthHandler {
 
   initSecrets (pass) {
     let manifest = JSON.parse(fs.readFileSync(path.join(__dirname, '../', 'mobile_auth', 'manifest.json')))
-    let maFile = fs.readFileSync(path.join(__dirname, '../', 'mobile_auth', manifest.entries[ 0 ].filename))
+    let maFile = fs.readFileSync(path.join(__dirname, '../', 'mobile_auth', manifest.entries[0].filename))
     let secrets = {}
 
     if (pass === '' || pass === undefined) {
@@ -62,8 +64,8 @@ class MobileAuthHandler {
     */
   }
 
-  getTOTPToken() {
-    steamTOTP.generateAuthCode(this.sharedSecret)
+  getTOTPToken () {
+    return steamTOTP.generateAuthCode(this.sharedSecret)
   }
 }
 
