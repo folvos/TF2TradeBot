@@ -21,7 +21,7 @@ fs.readFile(path.join(__dirname, '..', 'cfg', 'config.json'), (err, data) => {
 // Steam login function
 // If login credentials fail, will throw an error
 function steamLogin () {
-  // mobileAuthHandler = new MobileAuthHandler(null, null, config.mobileAuth.desktopAuthPassword)
+  mobileAuthHandler = new MobileAuthHandler(null, null, config.mobileAuth.desktopAuthPassword)
   let steamClient = new Steam.SteamClient()
   let steamUser = new Steam.SteamUser(steamClient)
   let steamFriends = new Steam.SteamFriends(steamClient)
