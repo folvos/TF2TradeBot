@@ -1,0 +1,20 @@
+{
+  "name": "tf2-trade-bot",
+  "version": "0.1.0",
+  "description": "A trade bot for TF2. Currently focusing on scrap banking and moving up from there.",
+  "main": "src/app.js",
+  "scripts": {
+    "start": "node src/app.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/yayes2/TF2TradeBot.git"
+  },
+  "author": "yayes2, CF12",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/yayes2/TF2TradeBot/issues"
+  },
+  "homepage": "https://github.com/yayes2/TF2TradeBot#readme"
+}
