@@ -8,7 +8,7 @@ function initSecrets (pass) {
   let secrets = {}
 
   if (pass === '' || pass === undefined) {
-    let maFile = JSON.parse(maFile)
+    maFile = JSON.parse(maFile)
     secrets = {
       sharedSecret: maFile.shared_secret,
       identitySecret: maFile.identity_secret
@@ -16,40 +16,36 @@ function initSecrets (pass) {
 
     console.log('Loaded Steam Desktop Authenticator data.')
   } else {
-    console.log('Starting decryption')
+    console.log('Decryption is currently not supported.')
+    process.exit(1)
 
+    /*
+    TODO: Fix decryption.
     maFile = decryptMaFile(pass, maFile, manifest)
     secrets = {
       sharedSecret: maFile.shared_secret,
       identitySecret: maFile.identity_secret
     }
+    */
   }
 
   return secrets
 }
 
+/*
+TODO: Fix decryption.
 function decryptMaFile (pass, maFile, manifest) {
-  let salt = Buffer.from(manifest.entries[0].encryption_salt, 'base64')
-  let key = ''
+  let salt = Buffer.from(manifest.entries[0].encryption_salt, 'base64').toString('binary')
+  let key = crypto.pbkdf2Sync(pass, salt, 50000, 32, 'sha256')
 
-  key = crypto.pbkdf2Sync(pass, salt, 50000, 32, 'sha256')
+  maFile = Buffer.from(maFile, 'base64').toString('binary')
+  let decipher = crypto.createDecipheriv('aes-256-cbc', key, Buffer.from(manifest.entries[0].encryption_iv, 'base64'))
+  decipher.setAutoPadding(true)
+  let decoded = decipher.update(maFile, 'binary', 'utf8')
 
-  let decipher = crypto.createDecipheriv('aes-256-cbc', Buffer.from(key, 'base64'), Buffer.from(manifest.entries[0].encryption_iv, 'base64'))
-
-  let decrypted = ''
-  decipher.on('readable', () => {
-    let data = decipher.read()
-    if (data) {
-      decrypted += data.toString('utf8')
-    }
-  })
-  decipher.on('end', () => {
-    console.log(decrypted)
-    console.log('Decrypted Steam Desktop Authenticator data.')
-  })
-
-  decipher.write(maFile, 'utf8')
-  decipher.end()
-
-  return decrypted
+  decoded += decipher.final('utf8')
+  return decoded
 }
+*/
+
+console.log(initSecrets())
