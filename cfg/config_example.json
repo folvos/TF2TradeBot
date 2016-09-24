@@ -1,0 +1,13 @@
+{
+  "backpackTF": {
+    "apiKey": ""
+  },
+  "steam": {
+    "username": "",
+    "password": "",
+    "apiKey": ""
+  },
+  "mobileAuth": {
+    "desktopAuthPassword": ""
+  }
+}
