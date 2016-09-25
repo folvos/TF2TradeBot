@@ -43,10 +43,12 @@ function steamLogin () {
     bot.steamID = steamClient.steamID
     steamFriends.setPersonaState(Steam.EPersonaState.Online)
   })
+  // On Machine Authorization
   steamUser.on('updateMachineAuth', (sentry, callback) => {
     fs.writeFileSync(path.join(__dirname, '..', 'mobile_auth', '.sentry'), sentry.bytes)
     callback({sha_file: getSHA1(sentry.bytes)})
   })
+  // Restart on error
   steamClient.on('error', () => {
     console.log('Disconnected from steam. Retrying.')
     steamClient.connect()
