@@ -18,12 +18,12 @@
   },
   "homepage": "https://github.com/yayes2/TF2TradeBot#readme",
   "dependencies": {
+    "js-rijndael": "^1.0.0",
     "snazzy": "^5.0.0",
     "standard": "^8.1.0",
     "steam": "^1.4.0",
+    "steam-community": "^0.2.1-0",
     "steam-totp": "^1.4.0",
-    "steam-tradeoffers": "^3.0.3",
-    "steam-web-api-key": "0.0.3",
-    "steam-weblogon": "0.0.5"
+    "steam-tradeoffer-manager": "^2.3.0"
   }
 }

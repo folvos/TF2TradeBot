@@ -2,10 +2,11 @@ const crypto = require('crypto')
 const fs = require('fs')
 const path = require('path')
 const Steam = require('steam')
-const getSteamAPIKey = require('steam-web-api-key')
-const SteamWebLogOn = require('steam-weblogon')
-const SteamTradeOffers = require('steam-tradeoffers')
+const TradeOfferManager = require('steam-tradeoffer-manager')
+const SteamCommunity = require('steam-community')
+const steamCommunity = new SteamCommunity()
 const MobileAuthHandler = require('./mobileauth.js')
+let tradeManager
 let mobileAuthHandler
 let bot = {}
 
@@ -32,24 +33,49 @@ function steamLogin () {
       account_name: config.steam.username,
       password: config.steam.password,
       two_factor_code: mobileAuthHandler.getTOTPToken(),
-      sha_sentryfile: (fs.existsSync(path.join(__dirname, '..', 'mobile_auth', '.sentry')) ? fs.readFileSync(path.join(__dirname, '..', 'mobile_auth', '.sentry')) : undefined)
+      sha_sentryfile: getSHA1(fs.existsSync(path.join(__dirname, '..', 'mobile_auth', '.sentry')) ? fs.readFileSync(path.join(__dirname, '..', 'mobile_auth', '.sentry')) : undefined)
     })
   })
+
   // On successful login
   steamClient.on('logOnResponse', (response) => {
     console.log('Steam account successfully authenticated')
     console.log('Session ID:', steamClient.sessionID)
     console.log('Steam ID:', steamClient.steamID)
+    bot.sessionID = steamClient.sessionID
     bot.steamID = steamClient.steamID
     steamFriends.setPersonaState(Steam.EPersonaState.Online)
+    steamUser.gamesPlayed([{game_id: 440}])
+
+    steamCommunity.login({
+      accountName: config.steam.username,
+      password: config.steam.password,
+      twoFactorCode: mobileAuthHandler.getTOTPToken()
+    }, (err) => {
+      if (err) throw err
+      tradeManager = new TradeOfferManager({
+        steam: steamUser,
+        community: steamCommunity,
+        language: 'en'
+      })
+      initTradeListeners()
+    })
   })
   steamUser.on('updateMachineAuth', (sentry, callback) => {
     fs.writeFileSync(path.join(__dirname, '..', 'mobile_auth', '.sentry'), sentry.bytes)
+    console.log('Updated sentry file. Trade will not work from the bot for 7 days.')
     callback({sha_file: getSHA1(sentry.bytes)})
   })
   steamClient.on('error', () => {
     console.log('Disconnected from steam. Retrying.')
     steamClient.connect()
+  })
+}
+
+function initTradeListeners () {
+  tradeManager.on('newOffer', (offer) => {
+    console.log('Received trade offer.')
+    console.log(offer)
   })
 }
 

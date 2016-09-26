@@ -2,6 +2,7 @@ const crypto = require('crypto')
 const path = require('path')
 const fs = require('fs')
 const steamTOTP = require('steam-totp')
+const crypt = require('js-rijndael')
 
 class MobileAuthHandler {
   constructor (sharedSecret, identitySecret, pass) {
@@ -32,13 +33,12 @@ class MobileAuthHandler {
       console.log('Decryption is currently not supported.')
       process.exit(1)
 
-      /* TODO: Fix decryption.
+      // TODO: Fix decryption.
       maFile = this.decryptMaFile(pass, maFile, manifest)
       secrets = {
         sharedSecret: maFile.shared_secret,
         identitySecret: maFile.identity_secret
       }
-      */
     }
 
     return secrets
@@ -51,9 +51,10 @@ class MobileAuthHandler {
 
     maFile = Buffer.from(maFile, 'base64')
     console.log(maFile.length)
-    /*
-    / The cipher-block chaining mode of operation maintains internal
+
+    // The cipher-block chaining mode of operation maintains internal
     // state, so to decrypt a new instance must be instantiated.
+    /*
     const aesCbc = new aesjs.ModeOfOperation.cbc(key, Buffer.from(manifest.entries[0].encryption_iv, 'base64'))
     const decryptedBytes = aesCbc.decrypt(maFile)
     console.log(decryptedBytes)
