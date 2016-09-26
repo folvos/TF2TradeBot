@@ -61,11 +61,13 @@ function steamLogin () {
       initTradeListeners()
     })
   })
+  // On Machine Authorization
   steamUser.on('updateMachineAuth', (sentry, callback) => {
     fs.writeFileSync(path.join(__dirname, '..', 'mobile_auth', '.sentry'), sentry.bytes)
     console.log('Updated sentry file. Trade will not work from the bot for 7 days.')
     callback({sha_file: getSHA1(sentry.bytes)})
   })
+  // Restart on error
   steamClient.on('error', () => {
     console.log('Disconnected from steam. Retrying.')
     steamClient.connect()
