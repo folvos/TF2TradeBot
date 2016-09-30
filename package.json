@@ -12,7 +12,7 @@
     "url": "git+https://github.com/yayes2/TF2TradeBot.git"
   },
   "author": "yayes2, CF12",
-  "license": "ISC",
+  "license": "MIT",
   "bugs": {
     "url": "https://github.com/yayes2/TF2TradeBot/issues"
   },
@@ -22,8 +22,9 @@
     "snazzy": "^5.0.0",
     "standard": "^8.1.0",
     "steam": "^1.4.0",
-    "steam-community": "^0.2.1-0",
     "steam-totp": "^1.4.0",
-    "steam-tradeoffer-manager": "^2.3.0"
+    "steam-tradeoffer-manager": "^2.3.0",
+    "steam-weblogon": "0.0.5",
+    "steamcommunity": "^0.2.1-0"
   }
 }

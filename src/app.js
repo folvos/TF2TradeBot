@@ -2,8 +2,9 @@ const crypto = require('crypto')
 const fs = require('fs')
 const path = require('path')
 const Steam = require('steam')
+const SteamWebLogon = require('steam-weblogon')
 const TradeOfferManager = require('steam-tradeoffer-manager')
-const SteamCommunity = require('steam-community')
+const SteamCommunity = require('steamcommunity')
 const steamCommunity = new SteamCommunity()
 const MobileAuthHandler = require('./mobileauth.js')
 let tradeManager
@@ -26,6 +27,7 @@ function steamLogin () {
   let steamClient = new Steam.SteamClient()
   let steamUser = new Steam.SteamUser(steamClient)
   let steamFriends = new Steam.SteamFriends(steamClient)
+  const steamWebLogOn = new SteamWebLogon(steamClient, steamUser)
 
   steamClient.connect()
   steamClient.on('connected', () => {
@@ -46,20 +48,23 @@ function steamLogin () {
     bot.steamID = steamClient.steamID
     steamFriends.setPersonaState(Steam.EPersonaState.Online)
     steamUser.gamesPlayed([{game_id: 440}])
+    steamWebLogOn.webLogOn((sessionID, cookies) => {
+      tradeManager.setCookies(cookies, (err) => {
+        if (err) {
+          console.error(err)
+          console.log('Unable to get Steam Web API key. This could be a result of a restricted account. Attempt to get the key online or try again.')
+          process.exit(1)
+        }
 
-    steamCommunity.login({
-      accountName: config.steam.username,
-      password: config.steam.password,
-      twoFactorCode: mobileAuthHandler.getTOTPToken()
-    }, (err) => {
-      if (err) throw err
-      tradeManager = new TradeOfferManager({
-        steam: steamUser,
-        community: steamCommunity,
-        language: 'en'
+        console.log('Got API key: ' + tradeManager.apiKey)
       })
-      initTradeListeners()
     })
+    tradeManager = new TradeOfferManager({
+      steam: steamUser,
+      community: steamCommunity,
+      language: 'en'
+    })
+    initTradeListeners()
   })
   // On Machine Authorization
   steamUser.on('updateMachineAuth', (sentry, callback) => {

@@ -7,7 +7,7 @@ const crypt = require('js-rijndael')
 class MobileAuthHandler {
   constructor (sharedSecret, identitySecret, pass) {
     if (sharedSecret == null || identitySecret == null) {
-      let secrets = this.initSecrets(pass)
+      let secrets = MobileAuthHandler.initSecrets(pass)
       this.sharedSecret = secrets.sharedSecret
       this.identitySecret = secrets.identitySecret
     } else {
@@ -16,7 +16,7 @@ class MobileAuthHandler {
     }
   }
 
-  initSecrets (pass) {
+  static initSecrets (pass) {
     let manifest = JSON.parse(fs.readFileSync(path.join(__dirname, '../', 'mobile_auth', 'manifest.json')))
     let maFile = fs.readFileSync(path.join(__dirname, '../', 'mobile_auth', manifest.entries[0].filename))
     let secrets = {}
@@ -34,7 +34,7 @@ class MobileAuthHandler {
       process.exit(1)
 
       // TODO: Fix decryption.
-      maFile = this.decryptMaFile(pass, maFile, manifest)
+      maFile = MobileAuthHandler.decryptMaFile(pass, maFile, manifest)
       secrets = {
         sharedSecret: maFile.shared_secret,
         identitySecret: maFile.identity_secret
@@ -45,7 +45,7 @@ class MobileAuthHandler {
   }
 
   // TODO: Fix decryption.
-  decryptMaFile (pass, maFile, manifest) {
+  static decryptMaFile (pass, maFile, manifest) {
     let salt = Buffer.from(manifest.entries[0].encryption_salt, 'base64').toString('binary')
     let key = crypto.pbkdf2Sync(pass, salt, 50000, 32, 'sha256')
 
