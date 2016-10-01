@@ -88,4 +88,5 @@ jspm_packages
 
 ### Project Specific
 cfg/config.json
+cfg/servers.json
 mobile_auth/*

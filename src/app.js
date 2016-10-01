@@ -7,8 +7,10 @@ const TradeOfferManager = require('steam-tradeoffer-manager')
 const SteamCommunity = require('steamcommunity')
 const steamCommunity = new SteamCommunity()
 const MobileAuthHandler = require('./mobileauth.js')
+const EconomyHandler = require('./economy.js')
 let tradeManager
 let mobileAuthHandler
+let economyHandler
 let bot = {}
 
 // config.json initializer
@@ -17,8 +19,13 @@ fs.readFile(path.join(__dirname, '..', 'cfg', 'config.json'), (err, data) => {
   if (err) throw err
 
   config = JSON.parse(data)
+  initEconomy()
   steamLogin()
 })
+
+function initEconomy () {
+  economyHandler = new EconomyHandler(config.backpackTF.apiKey, path.join(__dirname, '..', 'cfg', 'prices.json'))
+}
 
 // Steam login function
 // If login credentials fail, will throw an error
@@ -29,6 +36,7 @@ function steamLogin () {
   let steamFriends = new Steam.SteamFriends(steamClient)
   const steamWebLogOn = new SteamWebLogon(steamClient, steamUser)
 
+  if (fs.existsSync(path.join(__dirname, '..', 'cfg', 'servers.json'))) steamClient.servers = JSON.parse(fs.readFileSync(path.join(__dirname, '..', 'cfg', 'servers.json')))
   steamClient.connect()
   steamClient.on('connected', () => {
     steamUser.logOn({
@@ -37,6 +45,10 @@ function steamLogin () {
       two_factor_code: mobileAuthHandler.getTOTPToken(),
       sha_sentryfile: getSHA1(fs.existsSync(path.join(__dirname, '..', 'mobile_auth', '.sentry')) ? fs.readFileSync(path.join(__dirname, '..', 'mobile_auth', '.sentry')) : undefined)
     })
+  })
+
+  steamClient.on('servers', (servers) => {
+    fs.writeFile(path.join(__dirname, '..', 'cfg', 'servers.json'), JSON.stringify(servers))
   })
 
   // On successful login
