@@ -21,22 +21,29 @@ class PricesFile {
   syncToDisk () {
     fs.writeFile(this.path, JSON.stringify(this.data))
   }
+
+  getPrice (appId, name, transaction) {
+    const alias = this.data[appId].aliases[name] ? this.data[appId].aliases[name] : name
+    return this.data[appId].items[alias][transaction]
+  }
+
+  setCurrencies (metalRates, keyPrice) {}
 }
 
 class EconomyHandler {
-  constructor (backpackKey, pricesFile) {
+  constructor (backpackKey, pricesFile, metalRates) {
     BackpackAPIHandler = new BackScraper.APIHandler(backpackKey)
 
     this.pricesFile = new PricesFile(pricesFile)
-    this.initCurrency()
-  }
-
-  initCurrency () {
     BackpackAPIHandler.getCurrencies(440, (err, data) => {
       if (err) throw err
 
-      console.log(data.response.currencies)
+      console.log(data.response.currencies.keys.price)
     })
+  }
+
+  checkEquality (give, get) {
+
   }
 }
 

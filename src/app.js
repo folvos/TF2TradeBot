@@ -61,6 +61,8 @@ function steamLogin () {
     steamFriends.setPersonaState(Steam.EPersonaState.Online)
     steamUser.gamesPlayed([{game_id: 440}])
     steamWebLogOn.webLogOn((sessionID, cookies) => {
+      steamCommunity.setCookies(cookies)
+      steamCommunity.startConfirmationChecker(10000, mobileAuthHandler.getIdentitySecret())
       tradeManager.setCookies(cookies, (err) => {
         if (err) {
           console.error(err)
@@ -93,9 +95,55 @@ function steamLogin () {
 
 function initTradeListeners () {
   tradeManager.on('newOffer', (offer) => {
-    console.log('Received trade offer.')
-    console.log(offer)
+    offer.getUserDetails((err, me, them) => {
+      console.log('Received trade offer from ' + them.personaName + '.')
+      console.log('Offer is ' + parseItemsToHumanReadable(offer.itemsToGive) + ' for ' + parseItemsToHumanReadable(offer.itemsToReceive) + '.')
+      if (err) throw err
+
+      if (offer.isGlitched() || me.escrowDays > 0 || them.escrowDays > 0 || them.probation) {
+        declineOffer(offer)
+      } else if (config.admins.indexOf(offer.partner.accountid) > 0) {
+        acceptOffer(offer)
+      }
+    })
   })
+}
+
+function declineOffer (offer) {
+  console.log('Declining offer.')
+  offer.decline((err) => {
+    if (err) throw err
+
+    console.log('Offer successfully declined.')
+  })
+}
+
+function acceptOffer (offer) {
+  console.log('Accepting offer.')
+  offer.accept((err, status) => {
+    if (err) throw err
+
+    if (status === 'pending') {
+      console.log('Offer needs mobile confirmation.')
+      steamCommunity.checkConfirmations()
+    } else {
+      console.log('Offer successfully accepted.')
+    }
+  })
+}
+
+function parseItemsToHumanReadable (items) {
+  let result = ''
+  for (let item in items) {
+    const comma = (item !== items.length - 1)
+    console.log(comma)
+    console.log(item)
+    console.log(items.length - 1)
+    console.log(comma ? ', ' : '')
+    item = items[item]
+    result = result + item.amount + ' x ' + item.market_hash_name + (comma ? ', ' : '')
+  }
+  return result === '' ? 'nothing' : result
 }
 
 function getSHA1 (bytes) {

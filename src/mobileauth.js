@@ -16,6 +16,10 @@ class MobileAuthHandler {
     }
   }
 
+  getIdentitySecret () {
+    return this.identitySecret
+  }
+
   static initSecrets (pass) {
     let manifest = JSON.parse(fs.readFileSync(path.join(__dirname, '../', 'mobile_auth', 'manifest.json')))
     let maFile = fs.readFileSync(path.join(__dirname, '../', 'mobile_auth', manifest.entries[0].filename))
