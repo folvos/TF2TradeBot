@@ -24,7 +24,7 @@ fs.readFile(path.join(__dirname, '..', 'cfg', 'config.json'), (err, data) => {
 })
 
 function initEconomy () {
-  economyHandler = new EconomyHandler(config.backpackTF.apiKey, path.join(__dirname, '..', 'cfg', 'prices.json'))
+  economyHandler = new EconomyHandler(config.backpackTF.apiKey, path.join(__dirname, '..', 'cfg', 'prices.json'), config.metalRates)
 }
 
 // Steam login function
