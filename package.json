@@ -26,6 +26,6 @@
     "steam-totp": "^1.4.0",
     "steam-tradeoffer-manager": "^2.3.0",
     "steam-weblogon": "0.0.5",
-    "steamcommunity": "^0.2.1-0"
+    "steamcommunity": "^3.27.1"
   }
 }

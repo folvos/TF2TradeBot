@@ -1,4 +1,4 @@
-const crypto = require('crypto')
+                                                                                                                                                                                                                                                                                                                                                                                                                                                     const crypto = require('crypto')
 const fs = require('fs')
 const path = require('path')
 const Steam = require('steam')
@@ -100,22 +100,21 @@ function initTradeListeners () {
       console.log('Offer is ' + parseItemsToHumanReadable(offer.itemsToGive) + ' for ' + parseItemsToHumanReadable(offer.itemsToReceive) + '.')
       if (err) throw err
 
-      if (offer.isGlitched() || me.escrowDays > 0 || them.escrowDays > 0 || them.probation) {
-        declineOffer(offer)
-      } else if (config.admins.indexOf(offer.partner.accountid) > 0) {
-        acceptOffer(offer)
-      }
+      if (offer.isGlitched() || me.escrowDays > 0 || them.escrowDays > 0 || them.probation) declineOffer(offer)
+      else if (config.admins.indexOf(offer.partner.accountid) > 0) acceptOffer(offer)
+      else if (economyHandler.checkEquality(offer.itemsToGive, offer.itemsToReceive)) acceptOffer(offer)
+      else declineOffer(offer)
     })
   })
 }
 
 function declineOffer (offer) {
   console.log('Declining offer.')
-  offer.decline((err) => {
+  /*offer.decline((err) => {
     if (err) throw err
 
     console.log('Offer successfully declined.')
-  })
+  })*/
 }
 
 function acceptOffer (offer) {
@@ -133,8 +132,10 @@ function acceptOffer (offer) {
 }
 
 function parseItemsToHumanReadable (items) {
+  const items_parsed = []
+  
   let result = ''
-  for (let item in items) {
+  for (let item in items_parsed) {
     const comma = (item !== items.length - 1)
     console.log(comma)
     console.log(item)

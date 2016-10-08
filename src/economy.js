@@ -22,11 +22,6 @@ class PricesFile {
     fs.writeFile(this.path, JSON.stringify(this.data))
   }
 
-  getPrice (appId, name, transaction) {
-    const alias = this.data[appId].aliases[name] ? this.data[appId].aliases[name] : name
-    return this.data[appId].items[alias][transaction]
-  }
-
   setCurrencies (metalRates, keyPrice) {
     const currencies = {
       keys: {
@@ -46,14 +41,65 @@ class PricesFile {
         }
       }
     }
-    this.data[440].items['Scrap Metal']
+
+    this.data[440].items['Scrap Metal'] = {
+      buy: {
+        price: metalRates.scrapMetal,
+        units: 'metal'
+      },
+      sell: {
+        price: metalRates.scrapMetal,
+        units: 'metal'
+      }
+    }
+    this.data[440].items['Reclaimed Metal'] = {
+      buy: {
+        price: metalRates.reclaimedMetal,
+        units: 'metal'
+      },
+      sell: {
+        price: metalRates.reclaimedMetal,
+        units: 'metal'
+      }
+    }
+    this.data[440].items['Refined Metal'] = {
+      buy: {
+        price: metalRates.refinedMetal,
+        units: 'metal'
+      },
+      sell: {
+        price: metalRates.refinedMetal,
+        units: 'metal'
+      }
+    }
+    this.data[440].items['Mann Co. Supply Crate Key'] = {
+      buy: {
+        price: keyPrice.value,
+        units: 'metal'
+      },
+      sell: {
+        price: keyPrice.valueHigh,
+        units: 'metal'
+      }
+    }
     this.data[440].currencies = currencies
+
     this.syncToDisk()
+  }
+
+  getPrice (appId, name, transaction) {
+    const alias = this.data[appId].aliases[name] ? this.data[appId].aliases[name] : name
+    return this.data[appId].items[alias][transaction]
   }
 
   convertCurrency (value, from, to) {
     if (from === to) return value
-    return value / this.data[440].currencies[from].conversions[to]
+    if (this.data[440].currencies[from].conversions[to]) return value / this.data[440].currencies[from].conversions[to]
+    else {
+      for (const conversion in this.data[440].currencies[from])  {
+        if (this.data[440].currencies[conversion][to]) return this.convertCurrency(convertCurrency(value, from, conversion), conversion, to)
+      }
+    }
   }
 }
 
@@ -74,7 +120,36 @@ class EconomyHandler {
   }
 
   checkEquality (give, get) {
+    let giveValue = {price: 0, currency: ''}
+    let getValue = {price: 0, currency: ''}
 
+    for (let item in give) {
+      item = give[item]
+      const price = this.pricesFile.getPrice(440, item.market_hash_name, 'sell')
+
+      if (giveValue.currency === price.units) giveValue.price = price.price + (giveValue.price * item.amount)
+      else if (!giveValue.currency) {
+        giveValue.price = price.price + (giveValue.price * item.amount)
+        giveValue.currency = price.units
+      } else giveValue.price = price.price + this.pricesFile.convertCurrency(giveValue.price * item.amount, giveValue.currency, price.units)
+      
+      if (giveValue.price % 1 >= 0.96) giveValue.price = Math.round(giveValue.price)
+    }
+
+    for (let item in get) {
+      item = get[item]
+      const price = this.pricesFile.getPrice(440, item.market_hash_name, 'buy')
+
+      if (getValue.currency === price.units) getValue.price = price.price + (getValue.price * item.amount)
+      else if (!getValue.currency) {
+        getValue.price = price.price + (getValue.price * item.amount)
+        getValue.currency = price.units
+      } else getValue.price = price.price + this.pricesFile.convertCurrency(getValue.price * item.amount, getValue.currency, price.units)
+
+      if (getValue.price % 1 >= 0.96) getValue.price = Math.round(getValue.price)
+    }
+
+    return getValue.price >= giveValue.price
   }
 }
 
