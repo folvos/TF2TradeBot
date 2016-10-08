@@ -96,7 +96,7 @@ class PricesFile {
     if (from === to) return value
     if (this.data[440].currencies[from].conversions[to]) return value / this.data[440].currencies[from].conversions[to]
     else {
-      for (const conversion in this.data[440].currencies[from])  {
+      for (const conversion in this.data[440].currencies[from]) {
         if (this.data[440].currencies[conversion][to]) return this.convertCurrency(convertCurrency(value, from, conversion), conversion, to)
       }
     }

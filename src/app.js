@@ -1,4 +1,4 @@
-                                                                                                                                                                                                                                                                                                                                                                                                                                                     const crypto = require('crypto')
+const crypto = require('crypto')
 const fs = require('fs')
 const path = require('path')
 const Steam = require('steam')
@@ -80,12 +80,14 @@ function steamLogin () {
     })
     initTradeListeners()
   })
+
   // On Machine Authorization
   steamUser.on('updateMachineAuth', (sentry, callback) => {
     fs.writeFileSync(path.join(__dirname, '..', 'mobile_auth', '.sentry'), sentry.bytes)
     console.log('Updated sentry file. Trade will not work from the bot for 7 days.')
     callback({sha_file: getSHA1(sentry.bytes)})
   })
+
   // Restart on error
   steamClient.on('error', () => {
     console.log('Disconnected from steam. Retrying.')
@@ -93,6 +95,7 @@ function steamLogin () {
   })
 }
 
+// Initializes trade listeners
 function initTradeListeners () {
   tradeManager.on('newOffer', (offer) => {
     offer.getUserDetails((err, me, them) => {
@@ -108,15 +111,17 @@ function initTradeListeners () {
   })
 }
 
+// Function: Declines Offer
 function declineOffer (offer) {
   console.log('Declining offer.')
-  /*offer.decline((err) => {
+  offer.decline((err) => {
     if (err) throw err
 
     console.log('Offer successfully declined.')
-  })*/
+  })
 }
 
+// Function: Accepts Offer
 function acceptOffer (offer) {
   console.log('Accepting offer.')
   offer.accept((err, status) => {
@@ -131,9 +136,10 @@ function acceptOffer (offer) {
   })
 }
 
+// Function: Parses Items to become human readable
 function parseItemsToHumanReadable (items) {
   const items_parsed = []
-  
+
   let result = ''
   for (let item in items_parsed) {
     const comma = (item !== items.length - 1)
@@ -147,6 +153,7 @@ function parseItemsToHumanReadable (items) {
   return result === '' ? 'nothing' : result
 }
 
+// Function: Gets hash for sentry file
 function getSHA1 (bytes) {
   let shaSum = crypto.createHash('sha1')
   shaSum.end(bytes)
